@@ -31,17 +31,17 @@
         state: started
         enabled: true
 
-    - name: Generate the config file for nginx
-      ansible.builtin.template:
-        src: templdates/nginx.conf.j2
+    - name: Create the config file for nginx
+      ansible.builtin.copy:
+        src: conf-files/nginx.conf
         dest: /etc/nginx/nginx.conf
         owner: root
         group: root
         mode: "0644"
-      notify: Restart nginx
+      notify: Reload nginx
 
   handlers:
-    - name: Restart nginx
+    - name: Reload nginx
       ansible.builtin.service:
         name: nginx
-        state: restarted
+        state: reloaded
