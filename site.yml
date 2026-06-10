@@ -15,3 +15,33 @@
         name: "*"
         state: latest
       when: ansible_os_family == "RedHat"
+
+- name: Install and config nginx on webservers
+  hosts: webservers
+  become: true
+
+  tasks:
+    - name: Install nginx package
+      ansible.builtin.package:
+        name: nginx
+
+    - name: Ensure nginx is started and enabled
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Generate the config file for nginx
+      ansible.builtin.template:
+        src: templdates/nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart nginx
+
+  handlers:
+    - name: Restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
