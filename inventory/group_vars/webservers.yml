@@ -1,4 +1,4 @@
-deploy_dir: /var/www/html/dummy-website
+deploy_dir: /var/www/dummy-website.local
 web_user: www-data
 repo_url: https://github.com/FaridG7/dummy-website.git
 repo_branch: master
