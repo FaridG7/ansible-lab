@@ -16,20 +16,14 @@
         state: latest
       when: ansible_os_family == "RedHat"
 
-- name: Install dependencies
+- name: Install and config nginx
   hosts: webservers
   become: true
 
   tasks:
     - name: Install dependencies
       ansible.builtin.package:
-        name: git, nginx, acl
-
-- name: Install and config nginx
-  hosts: webservers
-  become: true
-
-  tasks:
+        name: nginx
     - name: Ensure nginx is started and enabled
       ansible.builtin.service:
         name: nginx
@@ -60,6 +54,10 @@
     web_user: "www-data"
 
   tasks:
+    - name: Install dependencies
+      ansible.builtin.package:
+        name: git, acl
+
     - name: Pull latest code from repo
       become: true
       become_user: "{{ web_user }}"
