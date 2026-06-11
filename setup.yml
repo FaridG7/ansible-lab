@@ -25,6 +25,7 @@
       ansible.builtin.package:
         name:
           - nginx
+          - openssl
 
     - name: Ensure certs directory exists
       ansible.builtin.file:
