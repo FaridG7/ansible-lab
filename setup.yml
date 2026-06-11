@@ -1,0 +1,85 @@
+---
+- name: Update package cache and upgrade packages
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Upgrade all packages (Debian)
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: dist
+      when: ansible_os_family == "Debian"
+
+    - name: Upgrade all packages (RedHat)
+      ansible.builtin.dnf:
+        name: "*"
+        state: latest
+      when: ansible_os_family == "RedHat"
+
+- name: Install and config nginx
+  hosts: webservers
+  become: true
+
+  tasks:
+    - name: Install dependencies
+      ansible.builtin.package:
+        name: git, nginx, acl
+
+- name: Install and config nginx
+  hosts: webservers
+  become: true
+
+  tasks:
+    - name: Ensure nginx is started and enabled
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Create the config file for nginx
+      ansible.builtin.copy:
+        src: conf-files/nginx.conf
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload nginx
+
+  handlers:
+    - name: Reload nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
+
+- name: Deploy the target
+  hosts: webservers
+  vars:
+    repo_url: "https://github.com/FaridG7/dummy-website.git"
+    repo_branch: "master"
+    deploy_dir: "/var/www/html/mysite"
+    web_user: "www-data"
+
+  tasks:
+    - name: Pull latest code from repo
+      become: true
+      become_user: "{{ web_user }}"
+      ansible.builtin.git:
+        repo: "{{ repo_url }}"
+        dest: "{{ deploy_dir }}"
+        version: "{{ repo_branch }}"
+        update: true
+        clone: true
+
+    - name: Set correct file permissions
+      become: true
+      ansible.builtin.file:
+        path: "{{ deploy_dir }}"
+        owner: "{{ web_user }}"
+        group: "{{ web_user }}"
+        recurse: true
+
+  handlers:
+    - name: Reload nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
