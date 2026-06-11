@@ -23,7 +23,9 @@
   tasks:
     - name: Install dependencies
       ansible.builtin.package:
-        name: nginx
+        name:
+          - nginx
+
     - name: Ensure nginx is started and enabled
       ansible.builtin.service:
         name: nginx
@@ -56,7 +58,9 @@
   tasks:
     - name: Install dependencies
       ansible.builtin.package:
-        name: git, acl
+        name:
+          - git
+          - acl
 
     - name: Pull latest code from repo
       become: true
