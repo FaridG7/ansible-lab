@@ -16,7 +16,7 @@
         state: latest
       when: ansible_os_family == "RedHat"
 
-- name: Install and config nginx
+- name: Install dependencies
   hosts: webservers
   become: true
 
