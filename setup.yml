@@ -57,10 +57,20 @@
 
   tasks:
     - name: Install dependencies
+      become: true
       ansible.builtin.package:
         name:
           - git
           - acl
+
+    - name: Ensure deploy directory exists and is owned by web user
+      become: true
+      ansible.builtin.file:
+        path: "{{ deploy_dir }}"
+        state: directory
+        owner: "{{ web_user }}"
+        group: "{{ web_user }}"
+        mode: "0755"
 
     - name: Pull latest code from repo
       become: true
@@ -79,9 +89,3 @@
         owner: "{{ web_user }}"
         group: "{{ web_user }}"
         recurse: true
-
-  handlers:
-    - name: Reload nginx
-      ansible.builtin.service:
-        name: nginx
-        state: reloaded
